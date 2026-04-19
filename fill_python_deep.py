@@ -1,4 +1,10 @@
-# Python AsyncIO & Networking I/O
+import os
+
+base_dir = r"C:\Users\jorda\Documents\ANTIGRAVITY\study17"
+docs_dir = os.path.join(base_dir, "docs")
+
+deep_content = {
+    "python/asyncio.md": r"""# Python AsyncIO & Networking I/O
 ### 1. 【課題解決のメカニズム】Mechanism of Problems
 **「通信待ち時間」という無駄な空白**
 データエンジニアリングで頻繁に発生するのが、「外部のWeb APIからデータを収集してDWHに保存する」処理です。例えば、1000個の異なるエンドポイントにリクエストを投げる処理を、標準の `requests.get()` の `for` ループで書いたとします。
@@ -37,3 +43,35 @@ sequenceDiagram
 * **Semaphore（セマフォ）による並行数制御**:
   1000回一気にリクエストを投げると、大概のAPIサーバーは「DoS攻撃を受けた」と判定して `429 Too Many Requests` のエラーを返してブロックしてきます。
   実務では必ず `asyncio.Semaphore(10)` などを使って、「同時に投げるリクエストは最大10個まで」といったスロットル制御（Throttling）を組み込むことが不可欠です。
+""",
+
+    "python/metaclasses.md": r"""# Metaclasses (Advanced Object Creation)
+### 1. 【課題解決のメカニズム】Mechanism of Problems
+**「クラスそのもの」を作る黒魔術**
+オブジェクト指向において、通常「クラス」は「インスタンス（具体的なモノ）」を作るための設計図です。では、「クラスという設計図自体」を作るものは何でしょうか？それが「メタクラス（Metaclass）」です。
+データモデリングやORM（SQLAlchemy, Django ORMなど）を作る場合、「ユーザーが普通にクラスを定義しただけで、裏側で勝手にバリデーションを追加し、DBのテーブルスキーマと紐付ける」といったフレームワーク側の魔法が必要になります。メタクラスは、この魔法を実現する究極のツールです。
+
+### 2. 【アーキテクチャの真髄】Architectural Deep Dive
+Pythonにおいてクラスはそれ自体が「オブジェクト（`type`クラスのインスタンス）」です。
+通常のクラスが `__init__` でインスタンスを初期化するように、メタクラスは `__new__` や `__init__` メソッドを持ち、そこで「新しく定義されようとしているクラスのメソッドや属性」をインターセプト（横取り）して書き換えることができます。
+
+```mermaid
+graph TD
+    Type((type <br/>The build-in Metaclass)) -->|Instances are Classes| Metaclass[Custom Metaclass]
+    Metaclass -->|Instances are Classes| Class[Your Base Class]
+    Class -->|Instances are Objects| Object[Actual Data Object]
+```
+
+### 3. 【実務への応用】Practical Application
+* **実務での制限事項**: 「メタクラスは99%のユーザーにとって不要である」(Tim Peters) という名言の通り、自前でデータフレームワークやORMをフルスクラッチ（開発）するのでない限り、データチームのアプリケーションコード内にメタクラスを実装するのは、保守性の観点から強力なアンチパターンとなります。しかし、「dbtなどの内部実装がどのようにSQLをパース・マッピングしているか」を理解するための教養として非常に価値が高いです。
+"""
+}
+
+# Write files directly
+for filepath, content in deep_content.items():
+    full_path = os.path.join(docs_dir, filepath)
+    if os.path.exists(full_path):
+        with open(full_path, "w", encoding="utf-8") as f:
+            f.write(content)
+            
+print("Generated Deep Dive Content for Python Expansion!")
