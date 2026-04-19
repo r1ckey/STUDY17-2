@@ -27,7 +27,7 @@
             background-image: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
                               radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
             color: var(--text-primary);
-            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            font-family: 'Inter', '-apple-system', 'Segoe UI', 'Roboto', 'Noto Sans JP', sans-serif;
             line-height: 1.6; overflow-x: hidden; min-height: 100vh;
         }
 
@@ -137,7 +137,11 @@
         .markdown-body p { margin-bottom: 1rem; font-size: 1.05rem; }
         .markdown-body pre { background: #011627; padding: 1.5rem; border-radius: 12px; overflow-x: auto; margin: 1.5rem 0; border: 1px solid rgba(255, 255, 255, 0.1); }
         .markdown-body code { font-family: 'JetBrains Mono', monospace; color: #82aaff; }
-        .markdown-body blockquote { border-left: 4px solid var(--accent-secondary); background: rgba(16, 185, 129, 0.1); padding: 1rem; margin: 1.5rem 0; font-style: italic; }
+        
+        .markdown-body h1 { background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; border-bottom: none; border-left: 6px solid var(--accent-primary); padding-left: 1rem; margin-bottom: 2rem; }
+        .markdown-body blockquote { border-left: 4px solid var(--accent-primary); background: rgba(59, 130, 246, 0.05); padding: 1.5rem; margin: 1.5rem 0; border-radius: 0 12px 12px 0; box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+        .markdown-body blockquote strong { color: var(--accent-primary); }
+    
         .markdown-body ul { padding-left: 1.5rem; margin-bottom: 1rem; }
         .markdown-body li { margin-bottom: 0.5rem; }
         .mermaid { background: transparent; padding: 1rem 0; text-align: center; }
@@ -194,7 +198,13 @@
 
             <div id="viewer" class="viewer">
                 <div class="content-meta">
-                    <span id="current-id" class="module-id" style="font-size: 1.2rem;"></span>
+                    <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                        <span id="current-id" class="module-id" style="font-size: 1.2rem;"></span>
+                        <span id="read-time" style="font-size: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span id="read-time-text">3 min read</span>
+                        </span>
+                      </div>
                     <button class="btn-complete" id="mark-complete-btn">完了としてマーク</button>
                 </div>
                 <div id="markdown-content" class="markdown-body"></div>
@@ -291,6 +301,10 @@
                 }
                 
                 mdContent.innerHTML = marked.parse(text);
+                const words = text.replace(/<[^>]*>?/gm, '').split(/\s+/).length;
+                const readMins = Math.max(1, Math.ceil(words / 400));
+                document.getElementById('read-time-text').textContent = `約 ${readMins} 分で読めます`;
+    
                 if (window.mermaid) { setTimeout(() => { mermaid.init(undefined, ".mermaid"); }, 20); }
                 document.querySelector('.main-content').scrollTop = 0;
             } catch (e) {
